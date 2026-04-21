@@ -6,37 +6,37 @@ const MIN_EXPONENT = 3;
 const MAX_EXPONENT = 20;
 const spectrumBands = [
   {
-    name: "Ραδιοφωνικά κύματα",
+    name: "ραδιοκύμματα",
     min: 1e3,
     max: 3e8,
   },
   {
-    name: "Μικροκύματα",
+    name: "μικροκύματα",
     min: 3e8,
     max: 3e11,
   },
   {
-    name: "Υπέρυθρη ακτινοβολία",
+    name: "υπέρυθρη ακτινοβολία",
     min: 3e11,
     max: 4e14,
   },
   {
-    name: "Ορατό φως",
+    name: "ορατό φως",
     min: 4e14,
     max: 7.5e14,
   },
   {
-    name: "Υπεριώδης ακτινοβολία",
+    name: "υπεριώδης ακτινοβολία",
     min: 7.5e14,
     max: 3e16,
   },
   {
-    name: "Ακτίνες Χ",
+    name: "ακτίνες Χ",
     min: 3e16,
     max: 3e19,
   },
   {
-    name: "Ακτίνες γ",
+    name: "ακτίνες γ",
     min: 3e19,
     max: Infinity,
   },
@@ -88,7 +88,7 @@ function getBandName(frequency) {
     ({ min, max }) => frequency >= min && frequency < max,
   );
 
-  return band ? band.name : "Άγνωστη περιοχή";
+  return band ? band.name : "άγνωστη περιοχή";
 }
 
 function updateFrequencyLabel() {
