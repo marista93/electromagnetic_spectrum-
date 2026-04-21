@@ -1,0 +1,267 @@
+:root {
+  --bg: #07111f;
+  --panel: rgba(5, 12, 23, 0.78);
+  --panel-soft: rgba(7, 17, 31, 0.72);
+  --line: rgba(155, 246, 255, 0.14);
+  --text: #e8f1ff;
+  --muted: #97aed0;
+  --accent: #61dafb;
+  --accent-strong: #9bf6ff;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(97, 218, 251, 0.18), transparent 38%),
+    linear-gradient(180deg, #0b1b31 0%, var(--bg) 100%);
+}
+
+.appShell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.controlPanel,
+.contentPanel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+    var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.controlPanel {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+  padding: 18px 22px;
+}
+
+.contentIntro {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent-strong);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  line-height: 1;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 3vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 2.5vw, 2.4rem);
+}
+
+.frequencyControl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.frequencyLabel {
+  color: var(--accent-strong);
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.frequencyControl input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.spectrumTicks {
+  position: relative;
+  height: 12px;
+}
+
+.spectrumTick {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 8px;
+  background: rgba(155, 246, 255, 0.55);
+  transform: translateX(-50%);
+}
+
+.frequencyValue {
+  min-width: 0;
+  text-align: left;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.contentPanel {
+  min-height: 0;
+  padding: 24px;
+  display: flex;
+  align-items: stretch;
+}
+
+.contentIntro {
+  width: 100%;
+  min-height: 100%;
+  min-width: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+    rgba(7, 17, 31, 0.48);
+}
+
+.sceneLayout {
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: minmax(120px, 18%) minmax(0, 1fr) minmax(56px, 5%);
+  gap: 0;
+  align-items: center;
+}
+
+.sceneEdge {
+  min-height: clamp(220px, 36vh, 420px);
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.sceneObject {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.sceneImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.28));
+}
+
+.sceneStage {
+  min-width: 0;
+  min-height: clamp(260px, 42vh, 520px);
+  display: flex;
+}
+
+.stageSurface {
+  flex: 1;
+  min-width: 0;
+  min-height: 100%;
+  padding: clamp(24px, 3vw, 34px);
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+}
+
+.stageSurface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(97, 218, 251, 0.04), transparent 14%, transparent 86%, rgba(97, 218, 251, 0.04)),
+    linear-gradient(rgba(143, 188, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(143, 188, 255, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 28px, 28px 100%;
+  pointer-events: none;
+}
+
+.stageCopy {
+  position: relative;
+  z-index: 1;
+  max-width: 42rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.stageCopy p {
+  margin: 0;
+}
+
+.stageCopy p:last-child {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.sceneEdgeSource {
+  justify-items: start;
+}
+
+.sceneEdgeSensor {
+  justify-items: end;
+}
+
+.sceneEdgeSource .sceneImage {
+  object-position: left center;
+}
+
+.sceneEdgeSensor .sceneImage {
+  object-position: right center;
+}
+
+@media (max-width: 780px) {
+  .appShell {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .controlPanel {
+    padding: 16px;
+  }
+
+  .contentPanel {
+    padding: 16px;
+  }
+
+  .sceneLayout {
+    grid-template-columns: minmax(72px, 18%) minmax(0, 1fr) minmax(36px, 5%);
+  }
+
+  .sceneEdge {
+    min-height: 110px;
+  }
+
+  .sceneStage {
+    min-height: 220px;
+  }
+}
