@@ -32,7 +32,7 @@ body {
 .appShell {
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 10px;
   padding: 10px;
 }
@@ -162,8 +162,97 @@ h2 {
 }
 
 .sceneObject {
+  position: relative;
   width: 100%;
   height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.sceneObjectWithSwitch {
+  display: block;
+}
+
+.powerSwitch {
+  position: absolute;
+  top: 50%;
+  left: 42%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.powerSwitchInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.powerSwitchTrack {
+  position: relative;
+  width: 74px;
+  height: 34px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid rgba(155, 246, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(9, 18, 31, 0.88);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.28);
+}
+
+.powerSwitchText {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.powerSwitchThumb {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--muted);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.powerSwitchInput:checked + .powerSwitchTrack {
+  border-color: rgba(147, 255, 176, 0.62);
+}
+
+.powerSwitchInput:checked + .powerSwitchTrack .powerSwitchTextOn {
+  color: #93ffb0;
+}
+
+.powerSwitchInput:not(:checked) + .powerSwitchTrack .powerSwitchTextOff {
+  color: var(--text);
+}
+
+.powerSwitchInput:checked + .powerSwitchTrack .powerSwitchThumb {
+  transform: translateX(-40px);
+  background: #0f2a24;
+  border: 1px solid #93ffb0;
+}
+
+.powerSwitchInput:focus-visible + .powerSwitchTrack {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sourceImageWrap {
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
 }
@@ -171,56 +260,56 @@ h2 {
 .sceneImage {
   width: 100%;
   height: 100%;
+  min-height: 0;
   object-fit: contain;
   filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.28));
 }
 
+.sourceIntensityControl {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 8px;
+  z-index: 3;
+  width: min(86%, 240px);
+  display: grid;
+  gap: 6px;
+}
+
+.sourceIntensityLabel {
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.sourceIntensityValue {
+  color: var(--text);
+}
+
+.sourceIntensityControl input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  accent-color: #93ffb0;
+  cursor: pointer;
+}
+
 .sceneStage {
+  position: relative;
   min-width: 0;
   min-height: clamp(260px, 42vh, 520px);
-  display: flex;
-}
-
-.stageSurface {
-  flex: 1;
-  min-width: 0;
-  min-height: 100%;
-  padding: clamp(24px, 3vw, 34px);
-  display: flex;
-  align-items: stretch;
-  position: relative;
+  display: block;
   overflow: hidden;
+  contain: layout paint;
 }
 
-.stageSurface::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(97, 218, 251, 0.04), transparent 14%, transparent 86%, rgba(97, 218, 251, 0.04)),
-    linear-gradient(rgba(143, 188, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(143, 188, 255, 0.08) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 28px, 28px 100%;
+.waveCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
   pointer-events: none;
-}
-
-.stageCopy {
-  position: relative;
-  z-index: 1;
-  max-width: 42rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-}
-
-.stageCopy p {
-  margin: 0;
-}
-
-.stageCopy p:last-child {
-  color: var(--muted);
-  line-height: 1.6;
 }
 
 .sceneEdgeSource {

@@ -8,6 +8,62 @@
   </head>
   <body>
     <main class="appShell">
+      <section class="contentPanel" aria-labelledby="content-title">
+        <div class="contentIntro">
+          <section class="sceneLayout" aria-labelledby="content-title">
+            <aside class="sceneEdge sceneEdgeSource" aria-label="Πηγή ακτινοβολίας">
+              <div class="sceneObject sceneObjectWithSwitch">
+                <div class="sourceImageWrap">
+                  <label class="powerSwitch" aria-label="On off">
+                    <input class="powerSwitchInput" type="checkbox" />
+                    <span class="powerSwitchTrack" aria-hidden="true">
+                      <span class="powerSwitchText powerSwitchTextOn">ON</span>
+                      <span class="powerSwitchText powerSwitchTextOff">OFF</span>
+                      <span class="powerSwitchThumb"></span>
+                    </span>
+                  </label>
+                  <img
+                    class="sceneImage"
+                    src="images/source.png"
+                    alt="Πηγή ακτινοβολίας"
+                  />
+                </div>
+                <div class="sourceIntensityControl">
+                  <label class="sourceIntensityLabel" for="intensitySlider">
+                    Ένταση I =
+                    <span id="intensityValue" class="sourceIntensityValue">50%</span>
+                  </label>
+                  <input
+                    id="intensitySlider"
+                    type="range"
+                    min="10"
+                    max="100"
+                    step="1"
+                    value="50"
+                    aria-describedby="intensityValue"
+                  />
+                </div>
+              </div>
+            </aside>
+
+            <section class="sceneStage" aria-label="Πεδίο διάδοσης">
+              <canvas
+                id="waveCanvas"
+                class="waveCanvas"
+                data-radiation-model="wave"
+                aria-hidden="true"
+              ></canvas>
+            </section>
+
+            <aside class="sceneEdge sceneEdgeSensor" aria-label="Αισθητήρας">
+              <div class="sceneObject">
+                <img class="sceneImage" src="images/sensor.png" alt="Αισθητήρας" />
+              </div>
+            </aside>
+          </section>
+        </div>
+      </section>
+
       <section class="controlPanel" aria-labelledby="app-title">
         <div class="frequencyControl">
           <label class="frequencyLabel" for="frequencySlider">
@@ -28,42 +84,6 @@
             class="spectrumTicks"
             aria-hidden="true"
           ></div>
-        </div>
-      </section>
-
-      <section class="contentPanel" aria-labelledby="content-title">
-        <div class="contentIntro">
-          <section class="sceneLayout" aria-labelledby="content-title">
-            <aside class="sceneEdge sceneEdgeSource" aria-label="Πηγή ακτινοβολίας">
-              <div class="sceneObject">
-                <img
-                  class="sceneImage"
-                  src="images/source.png"
-                  alt="Πηγή ακτινοβολίας"
-                />
-              </div>
-            </aside>
-
-            <section class="sceneStage" aria-labelledby="content-title">
-              <div class="stageSurface">
-                <div class="stageCopy">
-                  <p class="eyebrow">Πεδίο διάδοσης</p>
-                  <h2 id="content-title">Κεντρική περιοχή απεικόνισης</h2>
-                  <p>
-                    Ο χώρος αυτός προορίζεται για το plot ή το animation της
-                    ακτινοβολίας και παραμένει ουδέτερος ως προς την τεχνολογία
-                    υλοποίησης.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <aside class="sceneEdge sceneEdgeSensor" aria-label="Αισθητήρας">
-              <div class="sceneObject">
-                <img class="sceneImage" src="images/sensor.png" alt="Αισθητήρας" />
-              </div>
-            </aside>
-          </section>
         </div>
       </section>
     </main>
