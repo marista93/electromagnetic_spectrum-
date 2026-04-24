@@ -94,9 +94,209 @@ h2 {
   color: var(--accent-strong);
   font-weight: 700;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+.frequencyInfoButton {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(155, 246, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(7, 17, 31, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.frequencyInfoButton:focus-visible,
+.frequencyInfoCloseButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.frequencyEditor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.sourceIntensityHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.frequencyNumberInput {
+  width: 110px;
+  padding: 7px 10px;
+  border: 1px solid rgba(155, 246, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(7, 17, 31, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+
+.frequencyNumberInput:focus-visible,
+.frequencyUnitButton:focus-visible,
+.frequencyUnitOption:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.frequencyUnitSelect {
+  position: relative;
+}
+
+.frequencyUnitButton {
+  min-width: 78px;
+  padding: 7px 12px;
+  border: 1px solid rgba(155, 246, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(7, 17, 31, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.frequencyUnitMenu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
+  z-index: 6;
+  min-width: 88px;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(155, 246, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(7, 17, 31, 0.96);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+.frequencyUnitMenu[hidden] {
+  display: none;
+}
+
+.frequencyUnitOption {
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.frequencyUnitOption:hover,
+.frequencyUnitOption.is-selected {
+  background: rgba(155, 246, 255, 0.12);
+}
+
+.frequencyBand {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.frequencyInfoModal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.frequencyInfoModal[hidden] {
+  display: none;
+}
+
+.frequencyInfoBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 7, 15, 0.74);
+  backdrop-filter: blur(6px);
+}
+
+.frequencyInfoDialog {
+  position: relative;
+  width: min(720px, calc(100vw - 32px));
+  margin: min(8vh, 64px) auto;
+  padding: 22px 22px 18px;
+  border: 1px solid rgba(155, 246, 255, 0.18);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+    rgba(7, 17, 31, 0.98);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.frequencyInfoCloseButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(155, 246, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(7, 17, 31, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.frequencyInfoTitle {
+  margin: 0 0 16px;
+  color: var(--accent-strong);
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.frequencyInfoTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text);
+}
+
+.frequencyInfoTable th,
+.frequencyInfoTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(155, 246, 255, 0.12);
+  text-align: left;
+}
+
+.frequencyInfoTable th {
+  color: var(--accent-strong);
+  font-size: 0.92rem;
+}
+
+.powerInfoDialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.powerInfoContent {
+  color: var(--text);
+}
+
+.powerInfoContent p {
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+
+.powerInfoContent p:last-child {
+  margin-bottom: 0;
 }
 
 .frequencyControl input[type="range"] {
@@ -120,11 +320,45 @@ h2 {
   transform: translateX(-50%);
 }
 
-.frequencyValue {
-  min-width: 0;
-  text-align: left;
+.photonFluxPanel {
+  position: absolute;
+  left: calc(12% - 170px);
+  right: 12%;
+  bottom: -42px;
+  z-index: 3;
+  width: min(86%, 290px);
+  display: grid;
+  gap: 4px;
   color: var(--text);
+}
+
+.photonFluxHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.photonFluxLabel {
+  color: var(--accent-strong);
   font-weight: 700;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.photonFluxValue {
+  display: grid;
+  gap: 2px;
+  font-weight: 700;
+}
+
+.photonFluxNumber,
+.photonFluxUnit {
+  white-space: nowrap;
+}
+
+.photonFluxUnit {
+  font-weight: 600;
 }
 
 .contentPanel {
@@ -146,12 +380,90 @@ h2 {
 }
 
 .sceneLayout {
+  position: relative;
   width: 100%;
   min-height: 100%;
   display: grid;
   grid-template-columns: minmax(120px, 18%) minmax(0, 1fr) minmax(56px, 5%);
   gap: 0;
   align-items: center;
+}
+
+.waveTransport {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+
+.radiationModelSwitch {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(155, 246, 255, 0.18);
+  border-radius: 14px;
+  background: rgba(7, 17, 31, 0.86);
+}
+
+.radiationModelOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.radiationModelTitle {
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.radiationModelOption input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.waveTransportButton {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(155, 246, 255, 0.24);
+  border-radius: 10px;
+  background: rgba(7, 17, 31, 0.86);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.waveTransportButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(155, 246, 255, 0.42);
+}
+
+.waveTransportButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.waveTransportButton.is-active {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .sceneEdge {
@@ -170,6 +482,10 @@ h2 {
 }
 
 .sceneObjectWithSwitch {
+  display: block;
+}
+
+.sceneObjectSensor {
   display: block;
 }
 
@@ -283,6 +599,8 @@ h2 {
   display: inline-flex;
   justify-content: flex-start;
   gap: 8px;
+  flex-wrap: wrap;
+  line-height: 1.35;
 }
 
 .sourceIntensityValue {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Maria Spectrum</title>
+    <title>Electromagnetic Spectrum</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -11,14 +11,78 @@
       <section class="contentPanel" aria-labelledby="content-title">
         <div class="contentIntro">
           <section class="sceneLayout" aria-labelledby="content-title">
-            <aside class="sceneEdge sceneEdgeSource" aria-label="Πηγή ακτινοβολίας">
+            <div class="waveTransport" aria-label="Wave transport controls">
+              <button
+                id="wavePrevButton"
+                class="waveTransportButton"
+                type="button"
+                aria-label="Previous frame"
+              >
+                <span aria-hidden="true">&#9198;</span>
+              </button>
+              <button
+                id="wavePlayButton"
+                class="waveTransportButton"
+                type="button"
+                aria-label="Play wave propagation"
+              >
+                <span aria-hidden="true">&#9654;</span>
+              </button>
+              <button
+                id="wavePauseButton"
+                class="waveTransportButton"
+                type="button"
+                aria-label="Pause wave propagation"
+              >
+                <span aria-hidden="true">&#10074;&#10074;</span>
+              </button>
+              <button
+                id="waveNextButton"
+                class="waveTransportButton"
+                type="button"
+                aria-label="Next frame"
+              >
+                <span aria-hidden="true">&#9197;</span>
+              </button>
+            </div>
+            <fieldset
+              class="radiationModelSwitch"
+              aria-label="Μοντέλο ακτινοβολίας"
+            >
+              <span class="radiationModelTitle">Μοντέλο:</span>
+              <label class="radiationModelOption">
+                <input
+                  id="waveModelInput"
+                  type="radio"
+                  name="radiationModel"
+                  value="wave"
+                  checked
+                />
+                <span>Κυματικό</span>
+              </label>
+              <label class="radiationModelOption">
+                <input
+                  id="particleModelInput"
+                  type="radio"
+                  name="radiationModel"
+                  value="particle"
+                />
+                <span>Σωματιδιακό</span>
+              </label>
+            </fieldset>
+            <aside
+              class="sceneEdge sceneEdgeSource"
+              aria-label="Πηγή ακτινοβολίας"
+            >
               <div class="sceneObject sceneObjectWithSwitch">
                 <div class="sourceImageWrap">
                   <label class="powerSwitch" aria-label="On off">
                     <input class="powerSwitchInput" type="checkbox" />
                     <span class="powerSwitchTrack" aria-hidden="true">
                       <span class="powerSwitchText powerSwitchTextOn">ON</span>
-                      <span class="powerSwitchText powerSwitchTextOff">OFF</span>
+                      <span class="powerSwitchText powerSwitchTextOff"
+                        >OFF</span
+                      >
                       <span class="powerSwitchThumb"></span>
                     </span>
                   </label>
@@ -29,17 +93,29 @@
                   />
                 </div>
                 <div class="sourceIntensityControl">
-                  <label class="sourceIntensityLabel" for="intensitySlider">
-                    Ένταση I =
-                    <span id="intensityValue" class="sourceIntensityValue">50%</span>
-                  </label>
+                  <div class="sourceIntensityHeader">
+                    <button
+                      id="powerInfoButton"
+                      class="frequencyInfoButton"
+                      type="button"
+                      aria-label="Πληροφορίες ισχύος"
+                    >
+                      <span aria-hidden="true">i</span>
+                    </button>
+                    <label class="sourceIntensityLabel" for="intensitySlider">
+                      Ισχύς P =
+                      <span id="intensityValue" class="sourceIntensityValue"
+                        >1.0 μW</span
+                      >
+                    </label>
+                  </div>
                   <input
                     id="intensitySlider"
                     type="range"
-                    min="10"
-                    max="100"
-                    step="1"
-                    value="50"
+                    min="1"
+                    max="5"
+                    step="0.1"
+                    value="1"
                     aria-describedby="intensityValue"
                   />
                 </div>
@@ -56,8 +132,29 @@
             </section>
 
             <aside class="sceneEdge sceneEdgeSensor" aria-label="Αισθητήρας">
-              <div class="sceneObject">
-                <img class="sceneImage" src="images/sensor.png" alt="Αισθητήρας" />
+              <div class="sceneObject sceneObjectSensor">
+                <img
+                  class="sceneImage"
+                  src="images/sensor.png"
+                  alt="Αισθητήρας"
+                />
+                <div class="photonFluxPanel" aria-live="polite">
+                  <div class="photonFluxHeader">
+                    <button
+                      id="photonFluxInfoButton"
+                      class="frequencyInfoButton"
+                      type="button"
+                      aria-label="Πληροφορίες ροής φωτονίων"
+                    >
+                      <span aria-hidden="true">i</span>
+                    </button>
+                    <span class="photonFluxLabel">Ροή φωτονίων:</span>
+                  </div>
+                  <span id="photonFluxValue" class="photonFluxValue">
+                    <span class="photonFluxNumber">N = 0</span>
+                    <span class="photonFluxUnit">φωτόνια/μsec</span>
+                  </span>
+                </div>
               </div>
             </aside>
           </section>
@@ -66,10 +163,94 @@
 
       <section class="controlPanel" aria-labelledby="app-title">
         <div class="frequencyControl">
-          <label class="frequencyLabel" for="frequencySlider">
-            Συχνότητα f =
-            <span id="frequencyValue" class="frequencyValue">420 THz</span>
-          </label>
+          <div class="frequencyLabel">
+            <button
+              id="frequencyInfoButton"
+              class="frequencyInfoButton"
+              type="button"
+              aria-label="Πληροφορίες μονάδων συχνότητας"
+            >
+              <span aria-hidden="true">i</span>
+            </button>
+            <label for="frequencySlider">Συχνότητα f =</label>
+            <div class="frequencyEditor">
+              <input
+                id="frequencyNumberInput"
+                class="frequencyNumberInput"
+                type="number"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                value="275"
+                aria-label="Frequency value"
+              />
+              <div class="frequencyUnitSelect">
+                <button
+                  id="frequencyUnitButton"
+                  class="frequencyUnitButton"
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-label="Frequency unit"
+                >
+                  MHz
+                </button>
+                <div
+                  id="frequencyUnitMenu"
+                  class="frequencyUnitMenu"
+                  role="listbox"
+                  aria-label="Frequency units"
+                  hidden
+                >
+                  <button
+                    class="frequencyUnitOption"
+                    type="button"
+                    data-unit="kHz"
+                  >
+                    kHz
+                  </button>
+                  <button
+                    class="frequencyUnitOption"
+                    type="button"
+                    data-unit="MHz"
+                  >
+                    MHz
+                  </button>
+                  <button
+                    class="frequencyUnitOption"
+                    type="button"
+                    data-unit="GHz"
+                  >
+                    GHz
+                  </button>
+                  <button
+                    class="frequencyUnitOption"
+                    type="button"
+                    data-unit="THz"
+                  >
+                    THz
+                  </button>
+                  <button
+                    class="frequencyUnitOption"
+                    type="button"
+                    data-unit="PHz"
+                  >
+                    PHz
+                  </button>
+                  <button
+                    class="frequencyUnitOption"
+                    type="button"
+                    data-unit="EHz"
+                  >
+                    EHz
+                  </button>
+                </div>
+              </div>
+              <span id="frequencyBand" class="frequencyBand"
+                >(Ραδιοκύματα)</span
+              >
+            </div>
+          </div>
           <input
             id="frequencySlider"
             type="range"
@@ -77,7 +258,7 @@
             max="1000"
             step="1"
             value="560"
-            aria-describedby="frequencyValue"
+            aria-describedby="frequencyBand"
           />
           <div
             id="spectrumTicks"
@@ -87,6 +268,135 @@
         </div>
       </section>
     </main>
+
+    <div id="frequencyInfoModal" class="frequencyInfoModal" hidden>
+      <div class="frequencyInfoBackdrop" data-close-frequency-info="true"></div>
+      <section
+        class="frequencyInfoDialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="frequencyInfoTitle"
+      >
+        <button
+          id="frequencyInfoCloseButton"
+          class="frequencyInfoCloseButton"
+          type="button"
+          aria-label="Κλείσιμο πληροφοριών"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h2 id="frequencyInfoTitle" class="frequencyInfoTitle">
+          Μονάδες Συχνότητας
+        </h2>
+        <table class="frequencyInfoTable">
+          <thead>
+            <tr>
+              <th>Σύμβολο</th>
+              <th>Προφορά</th>
+              <th>Hz</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>kHz</td>
+              <td>κιλοχέρτζ</td>
+              <td>10³</td>
+            </tr>
+            <tr>
+              <td>MHz</td>
+              <td>μεγαχέρτζ</td>
+              <td>10⁶</td>
+            </tr>
+            <tr>
+              <td>GHz</td>
+              <td>γιγαχέρτζ</td>
+              <td>10⁹</td>
+            </tr>
+            <tr>
+              <td>THz</td>
+              <td>τεραχέρτζ</td>
+              <td>10¹²</td>
+            </tr>
+            <tr>
+              <td>PHz</td>
+              <td>πεταχέρτζ</td>
+              <td>10¹⁵</td>
+            </tr>
+            <tr>
+              <td>EHz</td>
+              <td>εξαχέρτζ</td>
+              <td>10¹⁸</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div id="powerInfoModal" class="frequencyInfoModal" hidden>
+      <div class="frequencyInfoBackdrop" data-close-power-info="true"></div>
+      <section
+        class="frequencyInfoDialog powerInfoDialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="powerInfoTitle"
+      >
+        <button
+          id="powerInfoCloseButton"
+          class="frequencyInfoCloseButton"
+          type="button"
+          aria-label="Κλείσιμο πληροφοριών ισχύος"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h2 id="powerInfoTitle" class="frequencyInfoTitle">Ισχύς (μW)</h2>
+        <div class="powerInfoContent">
+          <p>
+            Ενέργεια που φτάνει στον αισθητήρα
+            <strong>ανά μονάδα χρόνου</strong>.
+          </p>
+          <p><strong>1 μW = 10⁻⁶ W</strong></p>
+          <p>
+            <em
+              >Θεωρούμε ότι όλη η ακτινοβολία φτάνει στον αισθητήρα (χωρίς
+              απώλειες).</em
+            >
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <div id="photonFluxInfoModal" class="frequencyInfoModal" hidden>
+      <div
+        class="frequencyInfoBackdrop"
+        data-close-photon-flux-info="true"
+      ></div>
+      <section
+        class="frequencyInfoDialog powerInfoDialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="photonFluxInfoTitle"
+      >
+        <button
+          id="photonFluxInfoCloseButton"
+          class="frequencyInfoCloseButton"
+          type="button"
+          aria-label="Κλείσιμο πληροφοριών ροής φωτονίων"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h2 id="photonFluxInfoTitle" class="frequencyInfoTitle">
+          Ροή φωτονίων
+        </h2>
+        <div class="powerInfoContent">
+          <p>Πόσα φωτόνια φτάνουν στον αισθητήρα ανά μικροδευτερόλεπτο (μs).</p>
+          <p>
+            <strong
+              >1 μs = 10⁻⁶ s (ένα εκατομμυριοστό του δευτερολέπτου)</strong
+            >
+          </p>
+        </div>
+      </section>
+    </div>
 
     <script src="script.js"></script>
   </body>
