@@ -358,8 +358,9 @@ h2 {
 }
 
 .photonFluxValue {
-  display: grid;
-  gap: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   font-weight: 700;
 }
 

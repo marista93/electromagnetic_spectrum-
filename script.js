@@ -217,13 +217,13 @@ function formatPhotonFlux(photonFluxPerMicrosecond) {
     roundPhotonFluxForDisplay(photonFluxPerMicrosecond),
   );
   return {
-    html: `<span class="photonFluxNumber">N = ${formatIntegerWithSpaces(roundedValue)}</span><span class="photonFluxUnit">φωτόνια/μsec</span>`,
-    text: `N = ${roundedValue} φωτόνια/μsec`,
+    html: `<span class="photonFluxNumber">N = ${formatIntegerWithSpaces(roundedValue)}</span><span class="photonFluxUnit">φωτόνια/(μs·cm²)</span>`,
+    text: `N = ${roundedValue} φωτόνια/(μs·cm²)`,
   };
 }
 
 function formatIntensity(intensity) {
-  return `${Math.round(intensity)} J/(s·m²)`;
+  return `${Math.round(intensity)} mJ/(s·cm²)`;
 }
 
 function sliderValueToFrequency(value) {
