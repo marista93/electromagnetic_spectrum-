@@ -27,29 +27,37 @@ const wavePauseButton = document.getElementById("wavePauseButton");
 const waveNextButton = document.getElementById("waveNextButton");
 const sourcePowerSwitch = document.querySelector(".powerSwitchInput");
 const waveCanvas = document.getElementById("waveCanvas");
+const sourceImage = document.querySelector(".sceneEdgeSource .sceneImage");
+const sensorImage = document.querySelector(".sceneEdgeSensor .sceneImage");
 const waveContext = waveCanvas.getContext("2d", {
+  alpha: true,
+  desynchronized: true,
+});
+const particleLayerCanvas = document.createElement("canvas");
+const particleLayerContext = particleLayerCanvas.getContext("2d", {
   alpha: true,
   desynchronized: true,
 });
 
 const MIN_EXPONENT = 3;
 const MAX_EXPONENT = 20;
-const MIN_SENSOR_POWER_UW = 1;
-const MAX_SENSOR_POWER_UW = 5;
+const MIN_SENSOR_INTENSITY = 1000;
+const MAX_SENSOR_INTENSITY = 5000;
+const SENSOR_INTENSITY_TO_POWER_UW = 1 / 1000;
 const MICRO_WATT_TO_WATT = 1e-6;
 const PLANCK_CONSTANT_J_S = 6.63e-34;
 const WAVE_SPEED_PX_PER_MS = 0.24;
 const WAVE_STEP_MS = 40;
 const MAX_WAVE_SAMPLE_SPACING_PX = 5;
 const DISPLAYED_PARTICLE_LIMIT = 10000;
-const PHOTONS_PER_DISPLAY_PARTICLE = 15;
-const PARTICLE_DENSE_MODE_MIN_PHOTONS =
-  DISPLAYED_PARTICLE_LIMIT * PHOTONS_PER_DISPLAY_PARTICLE;
-const PARTICLE_RADIO_OPACITY = 0.05;
-const PARTICLE_GAMMA_OPACITY = 1;
-const PARTICLE_GAMMA_MIN_FREQUENCY_HZ = 3e19;
-const PARTICLE_RADIUS = 0.5;
+const PARTICLE_REFERENCE_MAX_FREQUENCY_HZ = 1e20;
+const PARTICLE_REFERENCE_MIN_FREQUENCY_HZ = 3e8;
+const PARTICLE_REFERENCE_MIN_DISPLAY_COUNT = 20;
+const PARTICLE_MAX_OPACITY = 1;
+const PARTICLE_RADIUS = 3;
 const PARTICLE_BLUR = 0;
+const PARTICLE_BLUR_START_DISPLAY_COUNT = 8000;
+const PARTICLE_MAX_BEAM_BLUR_PX = 6;
 const PARTICLE_LOG_INTERVAL_MS = 2500;
 let waveAnimationFrame = null;
 let waveSamples = [];
@@ -64,6 +72,7 @@ let lastParticleConsoleLogAt = 0;
 const particleSpriteCache = new Map();
 let waveCanvasWidth = 1;
 let waveCanvasHeight = 1;
+let cachedRadiationCenterY = null;
 let waveSimulationTime = 0;
 let lastWaveFrameTimestamp = 0;
 let isWavePlaying = true;
@@ -213,8 +222,8 @@ function formatPhotonFlux(photonFluxPerMicrosecond) {
   };
 }
 
-function formatPowerUw(powerUw) {
-  return `${powerUw.toFixed(1)} μW`;
+function formatIntensity(intensity) {
+  return `${Math.round(intensity)} J/(s·m²)`;
 }
 
 function sliderValueToFrequency(value) {
@@ -232,8 +241,12 @@ function clampFrequency(frequency) {
   return Math.min(10 ** MAX_EXPONENT, Math.max(10 ** MIN_EXPONENT, frequency));
 }
 
-function sliderValueToSensorPowerUw(value) {
+function sliderValueToSensorIntensity(value) {
   return Number(value);
+}
+
+function sensorIntensityToPowerUw(intensity) {
+  return intensity * SENSOR_INTENSITY_TO_POWER_UW;
 }
 
 function sensorPowerUwToWatt(powerUw) {
@@ -249,7 +262,8 @@ function getPhotonFluxPerSecond(powerWatt, frequency) {
 }
 
 function getRadiationStateFromControls() {
-  const powerUw = sliderValueToSensorPowerUw(intensitySlider.value);
+  const intensity = sliderValueToSensorIntensity(intensitySlider.value);
+  const powerUw = sensorIntensityToPowerUw(intensity);
   const powerWatt = sensorPowerUwToWatt(powerUw);
   const frequency = currentFrequencyHz;
   const sourceIsOn = sourcePowerSwitch.checked;
@@ -258,9 +272,11 @@ function getRadiationStateFromControls() {
     : 0;
   const photonFluxPerMicrosecond = photonFluxPerSecond / 1e6;
   const powerRatio =
-    (powerUw - MIN_SENSOR_POWER_UW) / (MAX_SENSOR_POWER_UW - MIN_SENSOR_POWER_UW);
+    (intensity - MIN_SENSOR_INTENSITY) /
+    (MAX_SENSOR_INTENSITY - MIN_SENSOR_INTENSITY);
 
   return {
+    intensity,
     powerUw,
     powerWatt,
     frequency,
@@ -278,13 +294,21 @@ function frequencyToPercent(frequency) {
 
 function renderSpectrumTicks() {
   const boundaries = spectrumBands.slice(1).map((band) => band.min);
+  const visibleBand = spectrumBands.find(({ name }) => name === "Ορατό φως");
+  const visibleStart = visibleBand ? frequencyToPercent(visibleBand.min) : 0;
+  const visibleEnd = visibleBand ? frequencyToPercent(visibleBand.max) : 0;
+  const visibleSpectrumImage = visibleBand
+    ? `<img class="visibleSpectrumImage" src="images/spectrum.png" alt="" style="left: ${visibleStart}%; width: ${visibleEnd - visibleStart}%;" />`
+    : "";
 
-  spectrumTicks.innerHTML = boundaries
-    .map((frequency) => {
-      const position = frequencyToPercent(frequency);
-      return `<span class="spectrumTick" style="left: ${position}%;"></span>`;
-    })
-    .join("");
+  spectrumTicks.innerHTML =
+    visibleSpectrumImage +
+    boundaries
+      .map((frequency) => {
+        const position = frequencyToPercent(frequency);
+        return `<span class="spectrumTick" style="left: ${position}%;"></span>`;
+      })
+      .join("");
 }
 
 function getBandName(frequency) {
@@ -367,15 +391,15 @@ function updateFrequencyLabel() {
 }
 
 function updateIntensityLabel() {
-  const { powerUw, photonFluxPerMicrosecond } = getRadiationStateFromControls();
-  const powerText = formatPowerUw(powerUw);
+  const { intensity, powerUw, photonFluxPerMicrosecond } = getRadiationStateFromControls();
+  const intensityText = formatIntensity(intensity);
 
-  intensityValue.textContent = powerText;
+  intensityValue.textContent = intensityText;
   intensityValue.setAttribute(
     "aria-label",
-    `${powerUw.toFixed(1)} microwatt`,
+    `${Math.round(intensity)} millijoule per second per square meter`,
   );
-  intensitySlider.setAttribute("aria-valuetext", powerText);
+  intensitySlider.setAttribute("aria-valuetext", intensityText);
   waveCanvas.dataset.sensorPowerUw = powerUw.toPrecision(4);
   waveCanvas.dataset.photonFlux = photonFluxPerMicrosecond.toExponential(4);
 }
@@ -429,6 +453,7 @@ function resizeWaveCanvas() {
 
   waveCanvasWidth = width;
   waveCanvasHeight = height;
+  cachedRadiationCenterY = null;
 
   if (waveCanvas.width === canvasWidth && waveCanvas.height === canvasHeight) {
     return;
@@ -436,11 +461,48 @@ function resizeWaveCanvas() {
 
   waveCanvas.width = canvasWidth;
   waveCanvas.height = canvasHeight;
+  particleLayerCanvas.width = canvasWidth;
+  particleLayerCanvas.height = canvasHeight;
   waveContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  particleLayerContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 }
 
 function clearWaveCanvas() {
   waveContext.clearRect(0, 0, waveCanvasWidth, waveCanvasHeight);
+}
+
+function clearParticleLayer() {
+  particleLayerContext.clearRect(0, 0, waveCanvasWidth, waveCanvasHeight);
+}
+
+function getElementCenterYWithinCanvas(element) {
+  if (!element) {
+    return null;
+  }
+
+  const elementRect = element.getBoundingClientRect();
+  const canvasRect = waveCanvas.getBoundingClientRect();
+
+  return elementRect.top + elementRect.height / 2 - canvasRect.top;
+}
+
+function getRadiationCenterY() {
+  if (cachedRadiationCenterY !== null) {
+    return cachedRadiationCenterY;
+  }
+
+  const centers = [sourceImage, sensorImage]
+    .map(getElementCenterYWithinCanvas)
+    .filter((center) => Number.isFinite(center));
+
+  if (centers.length === 0) {
+    cachedRadiationCenterY = waveCanvasHeight / 2;
+    return cachedRadiationCenterY;
+  }
+
+  cachedRadiationCenterY =
+    centers.reduce((sum, center) => sum + center, 0) / centers.length;
+  return cachedRadiationCenterY;
 }
 
 function pseudoRandom(seed) {
@@ -461,35 +523,51 @@ function getFrequencyRatio() {
   return (Math.log10(currentFrequencyHz) - MIN_EXPONENT) / (MAX_EXPONENT - MIN_EXPONENT);
 }
 
-function getParticleOpacityForFrequency(frequency) {
-  const frequencyExponent = Math.log10(clampFrequency(frequency));
-  const gammaExponent = Math.log10(PARTICLE_GAMMA_MIN_FREQUENCY_HZ);
-  const energyRatio = Math.min(
-    1,
-    Math.max(
-      0,
-      (frequencyExponent - MIN_EXPONENT) / (gammaExponent - MIN_EXPONENT),
-    ),
-  );
-
-  return (
-    PARTICLE_RADIO_OPACITY +
-    (PARTICLE_GAMMA_OPACITY - PARTICLE_RADIO_OPACITY) * energyRatio
-  );
+function getParticleOpacityForDisplayCount(displayCount) {
+  return PARTICLE_MAX_OPACITY;
 }
 
-function getDisplayPhotonCount(photonFluxPerMicrosecond) {
-  if (photonFluxPerMicrosecond > PARTICLE_DENSE_MODE_MIN_PHOTONS) {
+function getParticleBeamBlurForDisplayCount(displayCount) {
+  if (displayCount <= PARTICLE_BLUR_START_DISPLAY_COUNT) {
     return 0;
   }
 
-  return Math.max(
-    0,
-    Math.min(
-      DISPLAYED_PARTICLE_LIMIT,
-      Math.round(photonFluxPerMicrosecond / PHOTONS_PER_DISPLAY_PARTICLE),
+  const blurRatio = Math.min(
+    1,
+    Math.max(
+      0,
+      (displayCount - PARTICLE_BLUR_START_DISPLAY_COUNT) /
+        (DISPLAYED_PARTICLE_LIMIT - PARTICLE_BLUR_START_DISPLAY_COUNT),
     ),
   );
+
+  return PARTICLE_MAX_BEAM_BLUR_PX * blurRatio;
+}
+
+function getDisplayPhotonCount(frequency, intensity) {
+  const intensityRatio = intensity / MIN_SENSOR_INTENSITY;
+  const frequencySpan =
+    Math.log10(PARTICLE_REFERENCE_MAX_FREQUENCY_HZ) -
+    Math.log10(PARTICLE_REFERENCE_MIN_FREQUENCY_HZ);
+  const frequencyPosition = Math.max(
+    0,
+    (Math.log10(PARTICLE_REFERENCE_MAX_FREQUENCY_HZ) -
+      Math.log10(clampFrequency(frequency))) /
+      frequencySpan,
+  );
+  const countScale =
+    DISPLAYED_PARTICLE_LIMIT / PARTICLE_REFERENCE_MIN_DISPLAY_COUNT;
+  const displayCount = Math.round(
+    PARTICLE_REFERENCE_MIN_DISPLAY_COUNT *
+      intensityRatio *
+      countScale ** frequencyPosition,
+  );
+
+  if (displayCount > DISPLAYED_PARTICLE_LIMIT) {
+    return 0;
+  }
+
+  return Math.max(0, displayCount);
 }
 
 function getRadiationWavelength() {
@@ -498,27 +576,6 @@ function getRadiationWavelength() {
   const maxWavelength = Math.max(waveCanvasWidth, 320);
 
   return maxWavelength * (minWavelength / maxWavelength) ** sliderRatio;
-}
-
-function getPhotonProbabilityAtX(x, timestamp, params) {
-  const phase = isWavePlaying
-    ? params.angularFrequency * (timestamp - x / WAVE_SPEED_PX_PER_MS)
-    : -params.angularFrequency * (x / WAVE_SPEED_PX_PER_MS);
-  const waveValue = Math.sin(phase);
-
-  return waveValue * waveValue;
-}
-
-function getRandomPhotonX(timestamp, params) {
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    const x = Math.random() * waveCanvasWidth;
-
-    if (Math.random() <= getPhotonProbabilityAtX(x, timestamp, params)) {
-      return x;
-    }
-  }
-
-  return Math.random() * waveCanvasWidth;
 }
 
 function getWaveParamsFromControls() {
@@ -536,8 +593,12 @@ function getWaveParamsFromControls() {
 
 function getParticleParamsFromControls() {
   const radiationState = getRadiationStateFromControls();
-  const opacity = getParticleOpacityForFrequency(radiationState.frequency);
-  const displayCount = getDisplayPhotonCount(radiationState.photonFluxPerMicrosecond);
+  const displayCount = getDisplayPhotonCount(
+    radiationState.frequency,
+    radiationState.intensity,
+  );
+  const opacity = getParticleOpacityForDisplayCount(displayCount);
+  const beamBlur = getParticleBeamBlurForDisplayCount(displayCount);
   const wavelength = getRadiationWavelength();
 
   return {
@@ -549,6 +610,7 @@ function getParticleParamsFromControls() {
     radius: PARTICLE_RADIUS,
     opacity,
     blur: PARTICLE_BLUR,
+    beamBlur,
   };
 }
 
@@ -569,9 +631,12 @@ function getParticleSprite(params) {
   spriteCanvas.width = size;
   spriteCanvas.height = size;
   const spriteContext = spriteCanvas.getContext("2d");
+  const center = size / 2;
 
-  spriteContext.fillStyle = "rgb(255, 255, 255)";
-  spriteContext.fillRect(0, 0, size, size);
+  spriteContext.fillStyle = `rgba(255, 255, 255, ${params.opacity})`;
+  spriteContext.beginPath();
+  spriteContext.arc(center, center, radius, 0, Math.PI * 2);
+  spriteContext.fill();
 
   const sprite = {
     canvas: spriteCanvas,
@@ -605,8 +670,8 @@ function createParticleSampleAtX(timestamp, x) {
   };
 }
 
-function createRandomParticleSample(timestamp, params) {
-  return createParticleSampleAtX(timestamp, getRandomPhotonX(timestamp, params));
+function createRandomParticleSample(timestamp) {
+  return createParticleSampleAtX(timestamp, Math.random() * waveCanvasWidth);
 }
 
 function reconcileParticleSamplesAtCurrentTime(timestamp, params) {
@@ -621,7 +686,7 @@ function reconcileParticleSamplesAtCurrentTime(timestamp, params) {
   }
 
   while (particleSamples.length < targetCount) {
-    particleSamples.push(createRandomParticleSample(timestamp, params));
+    particleSamples.push(createRandomParticleSample(timestamp));
   }
 
   lastParticleSampleAt =
@@ -684,19 +749,14 @@ function emitParticleSamples(timestamp) {
     return;
   }
 
-  const sampleInterval = maxSampleAge / (params.displayCount * 2);
+  const sampleInterval = maxSampleAge / params.displayCount;
 
   while (lastParticleSampleAt <= timestamp) {
     particleEmissionIndex += 1;
-    if (
-      pseudoRandom(particleEmissionIndex * 3) <=
-      getPhotonProbabilityAtX(0, lastParticleSampleAt, params)
-    ) {
-      particleSamples.push({
-        emittedAt: lastParticleSampleAt,
-        normalizedOffset: pseudoRandom(particleEmissionIndex) * 2 - 1,
-      });
-    }
+    particleSamples.push({
+      emittedAt: lastParticleSampleAt,
+      normalizedOffset: pseudoRandom(particleEmissionIndex) * 2 - 1,
+    });
     lastParticleSampleAt += sampleInterval;
   }
 }
@@ -707,7 +767,9 @@ function commitWaveEmissionChange() {
     rebuildWaveAtCurrentTime();
   } else {
     rebuildParticlesAtCurrentTime();
-    console.log(`Displayed particles: ${particleSamples.length}`);
+    console.log(
+      `Displayed particles: ${particleSamples.length}, rgba: rgba(255, 255, 255, ${particleEmitterParams.opacity.toFixed(3)})`,
+    );
   }
   updateIntensityLabel();
   updatePhotonFluxLabel();
@@ -719,7 +781,7 @@ function renderWaveAtTime(timestamp) {
     return;
   }
 
-  const centerY = waveCanvasHeight / 2;
+  const centerY = getRadiationCenterY();
   const maxSampleAge = waveCanvasWidth / WAVE_SPEED_PX_PER_MS;
 
   emitWaveSamples(timestamp);
@@ -803,8 +865,8 @@ function renderParticlesAtTime(timestamp) {
 
   const params = particleEmitterParams || getParticleParamsFromControls();
   const sprite = getParticleSprite(params);
-  const centerY = waveCanvasHeight / 2;
-  waveContext.save();
+  const centerY = getRadiationCenterY();
+  clearParticleLayer();
 
   for (let index = 0; index < particleSamples.length; index += 1) {
     const particle = particleSamples[index];
@@ -812,7 +874,7 @@ function renderParticlesAtTime(timestamp) {
     const y = centerY + particle.normalizedOffset * params.amplitude;
     const size = Math.max(2, sprite.size);
 
-    waveContext.drawImage(
+    particleLayerContext.drawImage(
       sprite.canvas,
       x - size / 2,
       y - size / 2,
@@ -821,6 +883,15 @@ function renderParticlesAtTime(timestamp) {
     );
   }
 
+  waveContext.save();
+  waveContext.filter = params.beamBlur > 0 ? `blur(${params.beamBlur}px)` : "none";
+  waveContext.drawImage(
+    particleLayerCanvas,
+    0,
+    0,
+    waveCanvasWidth,
+    waveCanvasHeight,
+  );
   waveContext.restore();
 }
 

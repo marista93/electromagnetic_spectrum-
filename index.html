@@ -98,24 +98,24 @@
                       id="powerInfoButton"
                       class="frequencyInfoButton"
                       type="button"
-                      aria-label="Πληροφορίες ισχύος"
+                      aria-label="Πληροφορίες έντασης"
                     >
                       <span aria-hidden="true">i</span>
                     </button>
                     <label class="sourceIntensityLabel" for="intensitySlider">
-                      Ισχύς P =
+                      Ένταση I =
                       <span id="intensityValue" class="sourceIntensityValue"
-                        >1.0 μW</span
+                        >1000 J/(s·m²)</span
                       >
                     </label>
                   </div>
                   <input
                     id="intensitySlider"
                     type="range"
-                    min="1"
-                    max="5"
-                    step="0.1"
-                    value="1"
+                    min="1000"
+                    max="5000"
+                    step="100"
+                    value="1000"
                     aria-describedby="intensityValue"
                   />
                 </div>
@@ -344,17 +344,17 @@
           id="powerInfoCloseButton"
           class="frequencyInfoCloseButton"
           type="button"
-          aria-label="Κλείσιμο πληροφοριών ισχύος"
+          aria-label="Κλείσιμο πληροφοριών έντασης"
         >
           <span aria-hidden="true">&times;</span>
         </button>
-        <h2 id="powerInfoTitle" class="frequencyInfoTitle">Ισχύς (μW)</h2>
+        <h2 id="powerInfoTitle" class="frequencyInfoTitle">Ένταση (J/(s·m²))</h2>
         <div class="powerInfoContent">
           <p>
             Ενέργεια που φτάνει στον αισθητήρα
-            <strong>ανά μονάδα χρόνου</strong>.
+            <strong>ανά μονάδα χρόνου και ανά μονάδα επιφάνειας</strong>.
           </p>
-          <p><strong>1 μW = 10⁻⁶ W</strong></p>
+          <p><strong>Οι τιμές 1000-5000 διατηρούν την ίδια εσωτερική κλίμακα για τον υπολογισμό του N.</strong></p>
           <p>
             <em
               >Θεωρούμε ότι όλη η ακτινοβολία φτάνει στον αισθητήρα (χωρίς

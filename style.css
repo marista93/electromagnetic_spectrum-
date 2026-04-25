@@ -308,16 +308,27 @@ h2 {
 
 .spectrumTicks {
   position: relative;
-  height: 12px;
+  height: 18px;
 }
 
 .spectrumTick {
   position: absolute;
   top: 0;
+  z-index: 2;
   width: 1px;
-  height: 8px;
+  height: 18px;
   background: rgba(155, 246, 255, 0.55);
   transform: translateX(-50%);
+}
+
+.visibleSpectrumImage {
+  position: absolute;
+  top: 3px;
+  z-index: 1;
+  height: 12px;
+  display: block;
+  object-fit: fill;
+  pointer-events: none;
 }
 
 .photonFluxPanel {
@@ -384,7 +395,8 @@ h2 {
   width: 100%;
   min-height: 100%;
   display: grid;
-  grid-template-columns: minmax(120px, 18%) minmax(0, 1fr) minmax(56px, 5%);
+  grid-template-columns: minmax(120px, 18%) 600px minmax(56px, 5%);
+  justify-content: center;
   gap: 0;
   align-items: center;
 }
@@ -616,6 +628,7 @@ h2 {
 
 .sceneStage {
   position: relative;
+  width: 600px;
   min-width: 0;
   min-height: clamp(260px, 42vh, 520px);
   display: block;
@@ -631,11 +644,11 @@ h2 {
 }
 
 .sceneEdgeSource {
-  justify-items: start;
+  justify-items: end;
 }
 
 .sceneEdgeSensor {
-  justify-items: end;
+  justify-items: start;
 }
 
 .sceneEdgeSource .sceneImage {
@@ -669,6 +682,7 @@ h2 {
   }
 
   .sceneStage {
+    width: 100%;
     min-height: 220px;
   }
 }
