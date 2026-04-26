@@ -78,6 +78,7 @@ let lastWaveFrameTimestamp = 0;
 let isWavePlaying = true;
 let selectedFrequencyUnit = "MHz";
 let currentFrequencyHz = sliderValueToFrequency(frequencySlider.value);
+let frequencyInputMode = "rounded";
 let currentRadiationModel = "wave";
 const FREQUENCY_UNITS = [
   { factor: 1, suffix: "Hz" },
@@ -168,6 +169,10 @@ function formatFrequencyInputValue(frequency, unit) {
   const scaled = frequency / getFrequencyUnitFactor(unit);
   const rounded = scaled >= 100 ? Math.round(scaled) : Math.round(scaled * 10) / 10;
   return String(rounded).replace(/\.0$/, "");
+}
+
+function formatManualFrequencyInputValue(frequency, unit) {
+  return String(Math.round(frequency / getFrequencyUnitFactor(unit)));
 }
 
 function formatFrequencyWithUnit(frequency) {
@@ -387,7 +392,8 @@ function applyFrequencyEditorValue(unitOverride = selectedFrequencyUnit) {
     return;
   }
 
-  applyFrequencyValue(numericValue * getFrequencyUnitFactor(unitOverride), unitOverride);
+  frequencyInputMode = "manual";
+  applyFrequencyValue(Math.round(numericValue) * getFrequencyUnitFactor(unitOverride), unitOverride);
 }
 
 function applyIntensityValue(value) {
@@ -408,7 +414,10 @@ function updateFrequencyLabel() {
   const frequency = currentFrequencyHz;
   const bandName = getBandName(frequency);
 
-  frequencyNumberInput.value = formatFrequencyInputValue(frequency, selectedFrequencyUnit);
+  frequencyNumberInput.value =
+    frequencyInputMode === "manual"
+      ? formatManualFrequencyInputValue(frequency, selectedFrequencyUnit)
+      : formatFrequencyInputValue(frequency, selectedFrequencyUnit);
   frequencyUnitButton.textContent = selectedFrequencyUnit;
   frequencyBand.textContent = `(${bandName})`;
   frequencyBand.setAttribute("aria-label", `${formatFrequencyWithUnit(frequency)} (${bandName})`);
@@ -1052,6 +1061,7 @@ function updateSourcePower() {
 frequencySlider.addEventListener("input", () => {
   currentFrequencyHz = sliderValueToFrequency(frequencySlider.value);
   selectedFrequencyUnit = getBestFrequencyUnit(currentFrequencyHz);
+  frequencyInputMode = "rounded";
   commitWaveEmissionChange();
   updateFrequencyLabel();
 });

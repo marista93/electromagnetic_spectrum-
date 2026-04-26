@@ -99,6 +99,15 @@ h2 {
   flex-wrap: nowrap;
 }
 
+.spectrumTitle {
+  margin-left: auto;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .frequencyInfoButton {
   width: 30px;
   height: 30px;
