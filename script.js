@@ -226,6 +226,10 @@ function formatIntensity(intensity) {
   return `${Math.round(intensity)} mJ/(s·cm²)`;
 }
 
+function formatIntensityInputValue(intensity) {
+  return String(Math.round(intensity));
+}
+
 function sliderValueToFrequency(value) {
   const ratio = Number(value) / Number(frequencySlider.max);
   const exponent = MIN_EXPONENT + ratio * (MAX_EXPONENT - MIN_EXPONENT);
@@ -239,6 +243,13 @@ function sliderValueFromFrequency(frequency) {
 
 function clampFrequency(frequency) {
   return Math.min(10 ** MAX_EXPONENT, Math.max(10 ** MIN_EXPONENT, frequency));
+}
+
+function clampIntensity(intensity) {
+  return Math.min(
+    MAX_SENSOR_INTENSITY,
+    Math.max(MIN_SENSOR_INTENSITY, intensity),
+  );
 }
 
 function sliderValueToSensorIntensity(value) {
@@ -379,6 +390,20 @@ function applyFrequencyEditorValue(unitOverride = selectedFrequencyUnit) {
   applyFrequencyValue(numericValue * getFrequencyUnitFactor(unitOverride), unitOverride);
 }
 
+function applyIntensityValue(value) {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    updateIntensityLabel();
+    return;
+  }
+
+  const clampedIntensity = clampIntensity(numericValue);
+  intensitySlider.value = String(clampedIntensity);
+  intensityValue.value = formatIntensityInputValue(clampedIntensity);
+  commitWaveEmissionChange();
+}
+
 function updateFrequencyLabel() {
   const frequency = currentFrequencyHz;
   const bandName = getBandName(frequency);
@@ -394,10 +419,12 @@ function updateIntensityLabel() {
   const { intensity, powerUw, photonFluxPerMicrosecond } = getRadiationStateFromControls();
   const intensityText = formatIntensity(intensity);
 
-  intensityValue.textContent = intensityText;
+  if (document.activeElement !== intensityValue) {
+    intensityValue.value = formatIntensityInputValue(intensity);
+  }
   intensityValue.setAttribute(
     "aria-label",
-    `${Math.round(intensity)} millijoule per second per square meter`,
+    `${Math.round(intensity)} millijoule per second per square centimeter`,
   );
   intensitySlider.setAttribute("aria-valuetext", intensityText);
   waveCanvas.dataset.sensorPowerUw = powerUw.toPrecision(4);
@@ -1055,6 +1082,14 @@ frequencyUnitOptions.forEach((option) => {
 
 intensitySlider.addEventListener("input", () => {
   commitWaveEmissionChange();
+});
+
+intensityValue.addEventListener("change", () => {
+  applyIntensityValue(intensityValue.value);
+});
+
+intensityValue.addEventListener("blur", () => {
+  applyIntensityValue(intensityValue.value);
 });
 
 sourcePowerSwitch.addEventListener("change", updateSourcePower);

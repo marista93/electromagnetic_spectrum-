@@ -102,12 +102,21 @@
                     >
                       <span aria-hidden="true">i</span>
                     </button>
-                    <label class="sourceIntensityLabel" for="intensitySlider">
+                    <div class="sourceIntensityLabel">
                       Ένταση I =
-                      <span id="intensityValue" class="sourceIntensityValue"
-                        >1000 mJ/(s·cm²)</span
-                      >
-                    </label>
+                      <input
+                        id="intensityValue"
+                        class="sourceIntensityValue"
+                        type="number"
+                        min="1000"
+                        max="5000"
+                        step="100"
+                        value="1000"
+                        inputmode="numeric"
+                        aria-label="Τιμή έντασης"
+                      />
+                      <span class="sourceIntensityUnit">mJ/(s·cm²)</span>
+                    </div>
                   </div>
                   <input
                     id="intensitySlider"
@@ -116,6 +125,7 @@
                     max="5000"
                     step="100"
                     value="1000"
+                    aria-label="Ένταση"
                     aria-describedby="intensityValue"
                   />
                 </div>
