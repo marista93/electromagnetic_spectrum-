@@ -425,7 +425,9 @@ h2 {
   top: 14px;
   right: 14px;
   z-index: 5;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
   gap: 10px;
   margin: 0;
   padding: 8px 10px;
@@ -434,7 +436,8 @@ h2 {
   background: rgba(7, 17, 31, 0.86);
 }
 
-.radiationModelOption {
+.radiationModelOption,
+.magneticFieldOption {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -444,13 +447,25 @@ h2 {
   cursor: pointer;
 }
 
+.magneticFieldOption {
+  grid-column: 1 / -1;
+  padding-top: 2px;
+  color: rgba(232, 248, 255, 0.9);
+  font-size: 0.84rem;
+}
+
+.magneticFieldOption[hidden] {
+  display: none;
+}
+
 .radiationModelTitle {
   color: var(--accent-strong);
   font-size: 0.9rem;
   font-weight: 700;
 }
 
-.radiationModelOption input {
+.radiationModelOption input,
+.magneticFieldOption input {
   margin: 0;
   accent-color: var(--accent);
 }
